@@ -66,4 +66,28 @@ public class TicketController {
 
         return ResponseEntity.ok(ticketList);
     }
+
+    @PutMapping("/{id}/close")
+    public ResponseEntity<TicketResponseDTO> closeTicket(@PathVariable Long id) {
+        var optionalTicket = ticketRepository.findById(id);
+
+        if (optionalTicket.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Ticket ticket = optionalTicket.get();
+        ticket.setStatus(TicketStatus.CLOSED);
+        ticketRepository.save(ticket);
+
+        TicketResponseDTO responseDTO = new TicketResponseDTO(
+                ticket.getId(),
+                ticket.getTitle(),
+                ticket.getDescription(),
+                ticket.getStatus().toString(),
+                ticket.getCreatedAt(),
+                ticket.getCustomer().getName()
+        );
+
+        return ResponseEntity.ok(responseDTO);
+    }
 }
